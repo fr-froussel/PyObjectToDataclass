@@ -8,7 +8,7 @@ from typing import Optional, List
 class DataclassFieldInfo:
     field: Field
     wanted_value: any = None
-    has_same_characteristics: bool = False
+    has_same_characteristics: bool = True
     fields: List[DataclassFieldInfo] = None
 
     def fields_are_similar(self) -> bool:
@@ -47,7 +47,7 @@ class Object2Dataclass:
                     dc_find.has_same_characteristics = similar
                     dc_find.wanted_value = current_item
                     if parent_dc:
-                        parent_dc.has_same_characteristics = parent_dc.has_same_characteristics or similar
+                        parent_dc.has_same_characteristics = parent_dc.has_same_characteristics and similar
                 else:
                     if dc_find.fields:
                         Object2Dataclass.__find_dataclass_fields_in_object(

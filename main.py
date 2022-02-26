@@ -17,15 +17,18 @@ class Rectangle:
     color: Color = Color()
 
 
-obj = {'width': 50, 'height': 42, 'color': {
-    'red': 0, 'green': 128, 'blue': 255}}
-can_be_converted = Object2Dataclass.can_be_convert_to_dataclass(obj, Rectangle)
+try:
+    obj = {'width': 50, 'height': 42, 'color': {
+        'red': 0, 'green': 128, 'blue': 255}}
+    can_be_converted = Object2Dataclass.can_be_convert_to_dataclass(obj, Rectangle)
 
-print('Can be converted:', can_be_converted)
+    print('Can be converted:', can_be_converted)
 
-if can_be_converted:
-    rectangle: Rectangle = Object2Dataclass.convert_object_to_dataclass(
-        obj, Rectangle)
-    if rectangle is not None:
-        print(rectangle.height)
-        print(rectangle.color.blue)
+    if can_be_converted:
+        rectangle: Rectangle = Object2Dataclass.convert_object_to_dataclass(
+            obj, Rectangle)
+        if rectangle is not None:
+            print(rectangle.height)
+            print(rectangle.color.blue)
+except (TypeError, ValueError) as error:
+    print(error)

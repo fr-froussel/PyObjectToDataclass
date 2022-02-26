@@ -23,7 +23,8 @@ class Object2Dataclass:
     @staticmethod
     def __extract_dataclass_fields(dc: any, dc_fields: List[DataclassFieldInfo]):
         if dc is None:
-            return
+            error_message = 'The dataclass is not valid'
+            raise ValueError(error_message)
 
         for dc_field in fields(dc):
             dc_fields.append(DataclassFieldInfo(field=dc_field))
@@ -43,21 +44,37 @@ class Object2Dataclass:
                 current_item = obj[item]
 
                 if not isinstance(current_item, dict):
-                    similar = type(current_item) == dc_find.field.type
+                    item_type = type(current_item)
+                    dc_prop_type = dc_find.field.type
+                    similar = item_type == dc_prop_type
                     dc_find.has_same_characteristics = similar
-                    dc_find.wanted_value = current_item
+
+                    # Update parent status
                     if parent_dc:
                         parent_dc.has_same_characteristics = parent_dc.has_same_characteristics and similar
+
+                    # Raise an error if type aren't similar
+                    if similar:
+                        dc_find.wanted_value = current_item
+                    else:
+                        error_message = 'Property "{prop_name}" has type "{prop_type}" in the object BUT has type "{' \
+                                        'dc_prop_type}" in the dataclass'.format(
+                            prop_name=item, prop_type=item_type.__name__, dc_prop_type=dc_prop_type.__name__)
+                        raise TypeError(error_message)
                 else:
                     if dc_find.fields:
                         Object2Dataclass.__find_dataclass_fields_in_object(
                             current_item, dc_find.fields, dc_find)
+            else:
+                error_message = 'Property "{prop_name}" is not present in the dataclass'.format(prop_name=item)
+                raise ValueError(error_message)
 
     @staticmethod
     def __can_be_convert_to_dataclass(obj: any, dc: any):
         # Check if dc is a dataclass
         if not is_dataclass(dc):
-            return False, None
+            error_message = 'The dataclass is not a dataclass'
+            raise ValueError(error_message)
 
         dc_fields: List[DataclassFieldInfo] = []
 

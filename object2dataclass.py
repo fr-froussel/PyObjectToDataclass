@@ -1,6 +1,7 @@
 from __future__ import annotations
-from dataclasses import dataclass, Field, fields, is_dataclass, make_dataclass
-from typing import Optional
+
+from dataclasses import dataclass, Field, fields, is_dataclass
+from typing import Optional, List
 
 
 @dataclass
@@ -8,7 +9,7 @@ class DataclassFieldInfo:
     field: Field
     wanted_value: any = None
     has_same_characteristics: bool = False
-    fields: list[DataclassFieldInfo] = None
+    fields: List[DataclassFieldInfo] = None
 
     def fields_are_similar(self) -> bool:
         are_similar = self.has_same_characteristics
@@ -20,7 +21,7 @@ class DataclassFieldInfo:
 
 class Object2Dataclass:
     @staticmethod
-    def __extract_dataclass_fields(dc: any, dc_fields: list[DataclassFieldInfo]):
+    def __extract_dataclass_fields(dc: any, dc_fields: List[DataclassFieldInfo]):
         if dc is None:
             return
 
@@ -32,7 +33,8 @@ class Object2Dataclass:
                     getattr(dc, dc_field.name, None), dc_fields[-1].fields)
 
     @staticmethod
-    def __find_dataclass_fields_in_object(obj: any, dc_fields: list[DataclassFieldInfo], parent_dc: DataclassFieldInfo = None):
+    def __find_dataclass_fields_in_object(obj: any, dc_fields: List[DataclassFieldInfo],
+                                          parent_dc: DataclassFieldInfo = None):
         for item in obj:
             item_find_in_dc = [
                 dc_field for dc_field in dc_fields if dc_field.field.name == item]
@@ -54,10 +56,10 @@ class Object2Dataclass:
     @staticmethod
     def __can_be_convert_to_dataclass(obj: any, dc: any):
         # Check if dc is a dataclass
-        if (not is_dataclass(dc)):
-            return (False, None)
+        if not is_dataclass(dc):
+            return False, None
 
-        dc_fields: list[DataclassFieldInfo] = []
+        dc_fields: List[DataclassFieldInfo] = []
 
         # Retrieve dataclass fields
         Object2Dataclass.__extract_dataclass_fields(dc, dc_fields)
@@ -72,10 +74,10 @@ class Object2Dataclass:
             if not all_fields_are_similar:
                 break
 
-        return (all_fields_are_similar, dc_fields)
+        return all_fields_are_similar, dc_fields
 
     @staticmethod
-    def __fill_dataclass_with_object_values(created_dc: any, dc_fields: list[DataclassFieldInfo]):
+    def __fill_dataclass_with_object_values(created_dc: any, dc_fields: List[DataclassFieldInfo]):
         for field in dc_fields:
             if not field.fields:
                 setattr(created_dc, field.field.name, field.wanted_value)

@@ -28,7 +28,6 @@ try:
         rectangle: Rectangle = Object2Dataclass.convert_object_to_dataclass(
             obj, Rectangle)
         if rectangle is not None:
-            print(rectangle.height)
-            print(rectangle.color.blue)
+            print(rectangle)
 except (TypeError, ValueError) as error:
     print(error)
